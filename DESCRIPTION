@@ -1,0 +1,18 @@
+Package: empty-lesson
+Title: An empty version of the SLU DSS lesson template
+Version: 0.1.0
+Authors@R: person("Christopher", "Prener", email = "chris.prener@slu.edu",
+                  role = c("aut", "cre"))
+Description: This repository contains an empty version of the lesson template
+    and is designed to help instructors and maintainers get started with the
+    creation of new lessons. It can also be used to convert older lessons.
+Depends: R (>= 3.3)
+License: CC-BY-SA-4.0 + LICENSE
+Web: https://slu-dss.github.io
+URL: https://github.com/slu-dss/empty-lesson
+BugReports: https://github.com/slu-dss/empty-lesson/issues
+Imports:
+    here,
+    knitr,
+    rmarkdown,
+    usethis
