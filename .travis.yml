@@ -1,0 +1,22 @@
+language: r
+sudo: false
+cache: false
+
+r:
+  - oldrel
+  - release
+  - devel
+
+os:
+  - linux
+  - osx
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - r: devel
+      os: osx
+
+script:
+  - Rscript -e "rmarkdown::render('notebook/empty-lesson-complete.Rmd')"
+  - Rscript -e "rmarkdown::render('challenge/empty-lesson-challenge-complete.Rmd')"
