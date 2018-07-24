@@ -1,0 +1,22 @@
+---
+title: ""
+author: ""
+date: '(`r format(Sys.time(), "%B %d, %Y")`)'
+output:
+  github_document: default
+  html_notebook: default
+---
+
+## Introduction
+
+
+## Load Dependencies
+The following code loads the package dependencies.
+
+```{r package-load}
+
+```
+
+We now have the packages needed for our analyses.
+
+## Load Data
