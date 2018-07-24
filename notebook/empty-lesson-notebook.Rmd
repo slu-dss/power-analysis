@@ -1,0 +1,31 @@
+---
+title: ""
+author: ""
+date: '(`r format(Sys.time(), "%B %d, %Y")`)'
+output:
+  github_document: default
+  html_notebook: default
+---
+
+## Introduction
+
+
+## Load Dependencies
+The following code loads the package dependencies for our analysis from the `tidyverse`:
+
+```{r package-load-1}
+# tidyverse packages
+library(dplyr)    # data wrangling
+library(ggplot2)  # data plotting
+library(readr)    # work with csv files
+```
+
+Now you try loading two additional packages - `here` (for working with file paths) and `skimr` (for generating descriptive statistics):
+
+```{r package-load-2}
+
+```
+
+We now have the packages needed for our analyses.
+
+## Load Data
