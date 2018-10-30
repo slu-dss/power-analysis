@@ -1,0 +1,65 @@
+@import url(https://fonts.googleapis.com/css?family=Fira+Sans:300,300i,400,400i,500,500i,700,700i);
+@import url(https://cdn.rawgit.com/tonsky/FiraCode/1.204/distr/fira_code.css);
+
+@import url('https://www.themadstatter.com/slu/css/fonts/brandongrotesque.css');
+@import url('https://www.themadstatter.com/slu/css/fonts/crimsontext.css');
+
+:root {
+	--estragon-boot-brown: #663E16; 
+	--vladimir-bowler-green: #6CCA19;
+	--slu-blue: #003DA5;
+	--iris-white: #FFFFFF;
+	--college-church-grey: #C8C9C7;
+	--fountain-blue: #5BC2E7;
+	--grand-blue: #003B5C;
+	--billiken-bronze: #795D3E;
+	--gateway-gold: #FFC72C;
+	--rooftop-teal: #8FD6BD;
+	--oriflamme-orange: #ED8B00;
+	--slu-statistics: #9A7851;
+}
+
+h1, h2, h3 {
+  font-family: 'brandon_grotesque_regularRg, sans-serif';
+}
+
+body {
+  font-family: 'crimson_textregular', serif;
+}
+
+.remark-code, .remark-inline-code {
+  font-family: 'Fira Code', 'Lucida Console', Monaco, monospace;
+  font-size: 80%;
+}
+
+.img-center-50 {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
+}
+
+h1 {
+	color: var(--slu-blue);
+}
+
+h2 {
+	color: var(--college-church-grey);
+}
+
+.title-slide {
+  background-image: url("../img/slu-dss-logo.png");
+  background-size: 30%;
+  background-position: 50% 15%;
+  background-color: #FFFFFF;
+  text-shadow: none;
+  padding-top: 300px;
+}
+
+.title-slide > h1 {
+  color: var(--slu-statistics);
+}
+
+.title-slide > h3 {
+	color: var(--slu-blue);
+}

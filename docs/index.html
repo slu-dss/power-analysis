@@ -1,20 +1,25 @@
----
-title: "Power Analysis Primer"
-author: "Matt Schuelke"
-date: "2018-10-31"
-output:
-  xaringan::moon_reader:
-    lib_dir: libs
-    nature:
-      highlightStyle: github
-      highlightLines: true
-      countIncrementalSlides: false
-    css: [default, libs/css/slu-dss.css]
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Power Analysis Primer</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Matt Schuelke" />
+    <meta name="date" content="2018-10-31" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs\css\slu-dss.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Power Analysis Primer
+### Matt Schuelke
+### 2018-10-31
+
 ---
 
-```{r setup, include=FALSE}
-options(htmltools.dir.version = FALSE)
-```
+
+
 
 # An (Un)Motivating Example
 
@@ -44,8 +49,8 @@ Situation
 - Find suspect who seems congruent with evidence
 
 Null and alternative hypotheses are:
-- $H_o:$ suspect is innocent
-- $H_a:$ suspect is not innocent (guilty)
+- `\(H_o:\)` suspect is innocent
+- `\(H_a:\)` suspect is not innocent (guilty)
 
 We use evidence to suggest "beyond a shadow of a doubt" null is false
 
@@ -88,8 +93,8 @@ Because we never really know the true state of the world, our decisions can be e
 ## Question 1
 
 If the hypotheses in the Eileen paper were:
-- $H_o:$ Glucosamine does NOT have an effect
-- $H_a:$ Glucosmaine does have an effect
+- `\(H_o:\)` Glucosamine does NOT have an effect
+- `\(H_a:\)` Glucosmaine does have an effect
 
 What type of error might the authors have committed?
 
@@ -105,12 +110,12 @@ The publication industry typically prefers significant findings. What are the im
 
 We ordered a shipment of rats described as being able to run a standard maze in 33 seconds. Upon observing a few in our maze, they seemed slow. Thus we collected completion times for our sample in order to test:
 
-$H_o:$ population mean maze completion time was less than or equal to 33 seconds
+`\(H_o:\)` population mean maze completion time was less than or equal to 33 seconds
 
-$H_a:$ population mean maze completion time was greater than 33 seconds
+`\(H_a:\)` population mean maze completion time was greater than 33 seconds
 
 .pull-left[
-By putting $\alpha$ in the upper tail, we have specified what would be unusual results under a true null hypothesis.
+By putting `\(\alpha\)` in the upper tail, we have specified what would be unusual results under a true null hypothesis.
 
 We might then compute a test statistic describing the central tendency of our sample and place it on this figure. If the test statistic were to the left, that would not be enough evidence to warrent rejecting our null hypothesis. If the test statistic were to the right, our sample would be very unusual if the null is actually true.
 ]
@@ -127,15 +132,15 @@ One goal of NHST is to try and improve our changes of making correct decisions.
 
 One such correct decision is to retain the null when it is actually true.
 
-This is directly related to our choice of $\alpha$. In fact, it is $1 - \alpha$.
+This is directly related to our choice of `\(\alpha\)`. In fact, it is `\(1 - \alpha\)`.
 
 .pull-left[
-$\alpha = 0.05$
+`\(\alpha = 0.05\)`
 ![](libs/img/figure-09-02-1.png)
 ]
 
 .pull-right[
-$\alpha = 0.01$
+`\(\alpha = 0.01\)`
 ![](libs/img/figure-09-03-1.png)
 ]
 
@@ -175,11 +180,11 @@ Now let's show a larger difference between the null and alternative distribution
 ![](libs/img/figure-09-06-1.png)
 ]
 
-Here the null distribution and red area attributed to $\alpha$ did not change. However, the green area attributed to $\beta$ got smaller.
+Here the null distribution and red area attributed to `\(\alpha\)` did not change. However, the green area attributed to `\(\beta\)` got smaller.
 
 The area under the alternative distribution that is not green, represents a correct decision: to reject the null hypothesis when it is false.
 
-The probability represented by this unshaded area is 1 - $\beta$ and has a special name: POWER!
+The probability represented by this unshaded area is 1 - `\(\beta\)` and has a special name: POWER!
 
 ---
 
@@ -201,7 +206,7 @@ The judgement about what is practially noteworthy is not a statistical issue.
 
 ---
 
-# Factors Influencing Power:<br>#1) Effect Size
+# Factors Influencing Power:&lt;br&gt;#1) Effect Size
 
 In the rat shipment example, the effect size could be visualized as the distance between the null and alternative distributions.
 
@@ -215,7 +220,7 @@ Effect size is *positively* related to power.
 
 ---
 
-# Factors Influencing Power:<br>#2) Sample Size
+# Factors Influencing Power:&lt;br&gt;#2) Sample Size
 
 The factor that is most easily changed by researchers
 
@@ -231,7 +236,7 @@ That is, they want a decent probability of finding significance with the least a
 
 ---
 
-# Factors Influencing Power:<br>#3) Directional Hypotheses
+# Factors Influencing Power:&lt;br&gt;#3) Directional Hypotheses
 
 The choice of directional hypotheses can make it easier to find statistical significance
 
@@ -263,7 +268,7 @@ Suppose we wish to replicate these findings, but think an effect of 8 points wou
 
 ---
 
-# Factors Influencing Power:<br>#4) Significance Level
+# Factors Influencing Power:&lt;br&gt;#4) Significance Level
 
 Significance level is *positively* related to power
 - larger alpha lowers the critical value and thus increases power
@@ -279,11 +284,11 @@ In the glucosamine study, Wilkens et al. (2010) said, "... 250 patients should b
 
 ## Question 1
 
-What would happen to power if the researchers lowered $\alpha$ or changed to a one-tailed test?
+What would happen to power if the researchers lowered `\(\alpha\)` or changed to a one-tailed test?
 
 ---
 
-# Factors Influencing Power:<br>#5) Variability
+# Factors Influencing Power:&lt;br&gt;#5) Variability
 
 Effect size can be thought of as signal to noise ratio
 
@@ -299,11 +304,11 @@ Luckily the Central Limit Theorem tell us that under many situations
 - the sampling distribution of the sample mean is normally distributed
 - and the standard devaition of this distribution is
 
-$$\sigma/\sqrt{N}$$
+`$$\sigma/\sqrt{N}$$`
 
 ---
 
-# Factors Influencing Power:<br>#5) Variability
+# Factors Influencing Power:&lt;br&gt;#5) Variability
 
 There are two ways to make the signal to noise ratio big
 - increase the signal
@@ -342,7 +347,7 @@ This does not stop us from making two types of errors
 - Type II: failing to reject the null when it is false
 
 Null Hypothesis Significance Testing is designed to control
-- costly Type I errors directly by setting $\alpha$
+- costly Type I errors directly by setting `\(\alpha\)`
 - Type II errors via a constalation of factors related to its compliment: power
 
 Factors positively related to power
@@ -353,3 +358,51 @@ Factors positively related to power
 
 Factors negatively related to power
 - Variability
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
