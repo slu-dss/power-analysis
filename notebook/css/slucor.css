@@ -1,0 +1,98 @@
+slides > slide {
+  color: #000;
+}
+
+/* uncomment for blue bold
+b {
+  color: #003DA5;
+}
+
+
+h1, h2, h3 {
+  font-weight: 400;
+}
+*/
+
+/* line 280, ../scss/default.scss */
+h2 {
+  font-size: 30px;
+  letter-spacing: -1px;
+  line-height: 1;
+  font-weight: 600;
+  color: #003DA5;
+}
+
+/* line 287, ../scss/default.scss
+h3 {
+  font-size: 30px;
+  letter-spacing: -1px;
+  line-height: 1;
+  font-weight: inherit;
+  color: #003DA5;
+}
+*/
+ 
+strong {
+  color: #003DA5;
+}
+
+/* previous EJW edit for color
+h2 {
+  color: #003DA5;
+}
+
+h3 {
+  color: #003DA5;
+}
+*/
+
+code {
+  color: #B22222;
+}
+
+table.rmdtable tr > td:first-child, table th {
+  color: #000;
+}
+
+table.rmdtable td.highlight {
+  color: #000;
+}
+
+aside.gdbar {
+  height: 120px !important;
+  width: 95% !important;
+  top: 497px !important;
+  background: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #003DA5), color-stop(100%, #FFF)) no-repeat !important;
+  background: -webkit-linear-gradient(left, #003DA5, #FFF) no-repeat !important;
+  background: -moz-linear-gradient(left, #003DA5, #FFF) no-repeat !important;
+  background: -o-linear-gradient(left, #003DA5, #FFF) no-repeat !important;
+  background: linear-gradient(left, #003DA5, #FFF) no-repeat !important;
+}
+
+aside.gdbar img {
+  width: 360px !important;
+  height: 120px !important;
+  position: absolute; 
+  margin: 0px 0px;
+}
+
+.title-slide hgroup h1 {
+  color: #003DA5;
+}
+
+.title-slide hgroup h2 {
+  color: #003DA5;
+}
+
+.title-slide hgroup p {
+  font-size: 34px;
+  color: #fff;
+}
+
+/* Addition by EJW to size logo on content slides */
+slides > slide:not(.nobackground):before {
+  width: 150px;
+  height: 50px;
+  background-size: 150px 50px;
+}
+

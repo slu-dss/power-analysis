@@ -1,0 +1,527 @@
+---
+title: "Power Analysis Primer"
+author: "Matt Schuelke"
+date: '(`r format(Sys.time(), "%B %d, %Y")`)'
+bibliography: bibliography.bibtex
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    css: css/slucor.css
+  html_notebook: default
+  github_document: default
+---
+
+## Introduction
+
+This notebook introduces the concept of statistical power through explanation, example, and practice using one-sample, two-sample, and paired variants of the t-test.
+
+## Load Dependencies
+
+The following code loads the package dependencies for our work.
+
+```{r package-load-1}
+library(readr)  # import csv data files
+library(tibble) # make fancy data frames
+```
+
+Now you try loading an additional package - `here` (for working with file paths):
+
+```{r package-load-2}
+
+```
+
+## Power Primer Refresh
+
+Power is the probability of detecting an effect, given that the effect is really there (i.e., the probability of rejecting the null hypothesis when it is in fact false).
+
+$$power = \mathbb{P} (reject H_o | H_a = true)$$
+
+As such, power is defined under the alternative distribution and is the compliment of $\beta$, the probability of committing a Type II error:
+
+$$power = 1 - \beta$$
+
+A commonly accepted cut-off for $\beta$ is 0.20 which means folks often seek power greater than or equal to 0.80 (although 0.90 is also common). Power depends on a constellation of factors:
+
+* effect size
+    + larger effects are easier to detect
+* sample size
+    + larger samples generate more power
+* directional hypotheses
+    + specifying direction allows one to place all of $\alpha$ in one tail
+* significance level
+    + greater $\alpha$ means more probability to reject
+* variability
+    + experimental design can control variability and thus yield more power
+
+There are several reasons why one might perform a power analysis with the most common being to determine the required number of observations to detect a given effect size. Another quite common reason would be to determine if one can achieve sufficient power given limited resources. Power analyses are often required for project proposals and are one step in performing quality research because they make one think through their project in detail.
+
+## Package `pwr`
+
+The [pwr package](https://cran.r-project.org/package=pwr) is a handy package for doing power analyses for various common statistical procedures. This is not a standard R package, so you will need to install it before you run it. You only have to install it once, so I'm actually preventing this chunk from running automatically by setting the chunk option `eval = FALSE`. The only way this chunk runs is if I specifically put my cursor in it and tell it to run manually.
+
+If you do not have this package installed, you will need to do likewise, but only once.
+
+```{r, eval=FALSE}
+install.packages("pwr")
+```
+
+## One-sample t-test
+
+First, we read in some data, calculate some descriptive statistics, and then perform a one-sample t-test where we compare our sample to a mean of 1.
+
+### Hypotheses
+
+$H_o: \mu = 1$
+
+$H_a: \mu \ne 1$
+
+```{r}
+swimmers.csv <- read_csv(here("data", "swimmers.csv"))
+
+(n <- nrow(swimmers.csv))
+(m <- mean(swimmers.csv$speed))
+(s <- sd(swimmers.csv$speed))
+
+t.test(swimmers.csv$speed, mu = 1)
+```
+
+### Interpretation:
+
+A one-sample t-test suggested that our sample of swimmer times (M = 1.01, SD = 0.04) was not significantly different than 1 minute, t(17) = 1.17, p = 0.26.
+
+### Post-hoc Power Analysis
+
+Because we fail to reject the null, our test was under-powered by definition. Therefore, we might be interested in performing a post-hoc power analysis to determine what level of power we did achieve.
+
+We can calculate this using `pwr.t.test()` in the pwr package, but first we need to calculate some argument values to pass to the function. Let's check the help files for the function to know what the required arguments are:
+
+```{r, eval=FALSE}
+?pwr::pwr.t.test
+```
+
+Here we see that we need to pass all of the following arguments (except for the one we want to calculate, which we pass as NULL):
+
+* `n`
+    + the number of observations per sample
+    + in this case we only have one sample, so the number of observations (rows) in the data frame
+* `d`
+    + the effect size
+    + [Cohen's d](https://en.wikipedia.org/wiki/Effect_size#Cohen.27s_d) in this case
+* `sig.level`
+    + alpha level
+* [`power`](https://en.wikipedia.org/wiki/Statistical_power)
+    + power of the test
+    + which is equal to $1 - \beta$, where $\beta$ is the probability of committing a Type II Error
+    + powers of 0.80 and 0.90 are the most commonly sought
+* `type`
+    + type of t-test as a string, `"one-sample"` in this case
+* `alternative`
+    + another character string specifying the alternative hypothesis, `"two.sided"` in this case
+
+Because we wish to calculate the observed power of our test, we will need to figure out values for all the arguments except for `power` will be passed as `NULL` and thus calculated based on the value of these other arguments by the function.
+
+Cohen's d is actually a family of effect sizes describing the difference between groups in standard deviation units (very similar to the formula for a z-score). The formula for the one sample case given by Cohen [-@cohen1988statistical] (f. 2.5.7, p. 72) is:
+
+$$d_s = \frac{\bar{X} - c}{s}$$
+
+Where $\bar{X}$ will be the mean from our alternative hypothesis (i.e., the mean of our sample); c will be the hypothesized constant; and s can be the standard deviation of our sample.
+
+```{r}
+(cohens_d <- (m - 1) / s)
+```
+
+We compute the observed power thusly:
+
+```{r}
+pwr::pwr.t.test(n = n, 
+                d = cohens_d, 
+                sig.level = 0.05, 
+                power = NULL,
+                type = "one.sample", 
+                alternative = "two.sided")
+```
+
+So our observed power was only 0.20, which is much smaller than our minimally acceptable power of 0.80.
+
+#### Power via Simulation
+
+![](img/advanced.png){width=100px}
+
+We could also estimate power via simulation.
+
+```{r}
+mean(replicate(10000, {
+  t.test(rnorm(n = n, 
+               mean = m, 
+               sd = s), 
+         mu = 1)$p.value < 0.05
+}))
+```
+
+### A Priori Power Analysis
+
+Because the observed power of our test was quite low, the next logical question is what would be the minimum sample size required to attain a significant p-value in this situation? So that we might do better next time.
+
+We simply pass a NULL value for the n argument and now pass 0.80 as the value for the power argument.
+
+```{r}
+p <- pwr::pwr.t.test(n = NULL,
+                     d = cohens_d,
+                     sig.level = 0.05,
+                     power = 0.80,
+                     type = "one.sample",
+                     alternative = "two.sided")
+```
+
+So we would need 106 (round up because can't have 0.23 observations) swimmers at a theoretical minimum to detect a Cohen's d of 0.28 using a one-sample t-test to test a two-tailed hypothesis.
+
+And here is a visualization of power as a function of sample size.
+
+```{r}
+plot(p)
+```
+
+### Practice
+
+@brick_association_2010 explored the effect of many variables (exercise, caffeine intake, etc.) on medical students' sleep. One criterion variable in the study was the Pittsburgh Sleep Quality Index (PSQI). This measure produces higher scores for people with more sleep problems (i.e., lower sleep quality). The researchers hypothesized that "medical students would report worse sleep quality in comparison to published normative samples of healthy, young adults" (p. 114). The mean of their 293 student sample was 6.37 and the standard deviation was 2.57. Imagine they wished to compare their sample to a population normative score of 5.60 as reported by @carney_daily_2006.
+
+As a hint the hypotheses are:
+
+$H_o: \mu \le 5.60$
+
+$H_a: \mu \gt 5.60$
+
+First compute Cohen's ds.
+
+```{r}
+
+```
+
+Next conduct a post-hoc power analysis to compute the observed power.
+
+```{r}
+
+```
+
+Finally conduct an a priori power analysis to determine the minimum number of subjects required.
+
+```{r}
+
+```
+
+## Two-sample t-test
+
+Let's do the same things for a two-sample t-test. First we read in some data, then calculate some descriptive statistics, and finally perform the two-sample t-test.
+
+### Hypotheses
+
+$H_o: \mu_1 = \mu_2$
+
+$H_a: \mu_1 \ne \mu_2$
+
+```{r}
+energy.csv <- read_csv(here("data", "energy.csv"))
+
+(n_lean <- nrow(energy.csv[energy.csv$stature == "lean", ]))
+(n_obese <- nrow(energy.csv[energy.csv$stature == "obese", ]))
+
+(m_lean <- mean(energy.csv[energy.csv$stature == "lean", ]$expend))
+(m_obese <- mean(energy.csv[energy.csv$stature == "obese", ]$expend))
+
+(s_lean <- sd(energy.csv[energy.csv$stature == "lean", ]$expend))
+(s_obese <- sd(energy.csv[energy.csv$stature == "obese", ]$expend))
+
+t.test(expend ~ stature, data = energy.csv)
+```
+
+### Interpretation
+
+A Welch two-sample t-test suggested the energy expenditures for those with a stature of lean (M = 8.07, SD = 1.24) were significantly different than those with a stature of obese (M = 10.30, SD = 1.40), t(15.92) = -3.86, p = .00.
+
+### Post-hoc Power Analysis
+
+While the earlier example was an under-powered one-sample t-test, this example for a two-sample t-test is already significant. Therefore, we have achieved adequate power by definition.
+
+Even though the significance of the test tells us that our observed power is greater than our minimally acceptable 0.80, we might wish to calculate what it was.
+
+To do so we need to calculate a different version of Cohen's d. The formula for a two-sample test [@cohen1988statistical] (f. 2.5.1, p. 66) is:
+
+$$d_s = \frac{\bar{X}_a - \bar{X}_b}{s}$$
+
+In this case $\bar{X}_a$ and $\bar{X}_b$ are going to be equal to the means of our samples.
+
+However, there is a new issue here which results in two practical considerations we must address before we can perform that calculation.
+
+The new idea is that because we have two groups, the sizes of those two groups can differ (and they do differ in this case). Therefore, it is a good idea to weight any descriptive statistics such that the descriptive statistics from larger groups get more weight and vice versa.
+
+The first practical consideration that results from this idea is that we should use a different function from the `pwr` package to help deal with this weighting issue.
+
+Let's look at the help page for `pwr::pwr.t2n.test()`.
+
+```{r, eval=FALSE}
+?pwr::pwr.t2n.test
+```
+
+We see most of the same required arguments as before, but now the `n` argument is split into `n1` and `n2`.
+
+The second practical consideration that results from the new idea of differing groups sizes is that our effect size for t-tests (i.e., Cohen's d) requires a single estimate of the spread of the data. Therefore, we must calculate a [pooled standard deviation](https://en.wikipedia.org/wiki/Pooled_variance).
+
+While pooled deviations can be calculated for any number of groups, a formula for just two groups [@cohen1988statistical] (f. 2.5.2, p. 67) is:
+
+$$s = \sqrt{\frac{\sum{(X_A - \bar{X_A})^2} + \sum{(X_B - \bar{X_B})^2}}{n_a + n_b - 2}}$$
+
+but you will often see it written thusly:
+
+$$s_{pooled} = \sqrt{\frac{(n_1 - 1) * s^2_1 + (n_2 - 1) * s^2_s}{n_1 + n_2 - 2}}$$
+
+and here is a custom R function to perform this calculation:
+
+```{r}
+sd_pooled <- function (sd1, n1, sd2, n2) {
+  sqrt(((n1 - 1) * sd1^2 + (n2 - 1) * sd2^2) / (n1 + n2 - 2))
+}
+```
+
+We compute this pooled standard deviation and then call `pwr::pwr.t2n.test()` with all the requisite argument values except for power which we pass as `NULL` because that is the one we wish to compute.
+
+```{r}
+(s_pooled <- sd_pooled(sd1 = s_lean, 
+                       n1 = n_lean, 
+                       sd2 = s_obese, 
+                       n2 = n_obese))
+(cohens_d <- (m_lean - m_obese) / s_pooled)
+
+pwr::pwr.t2n.test(n1 = n_lean,
+                  n2 = n_obese,
+                  d = cohens_d,
+                  sig.level = 0.05,
+                  power = NULL,
+                  alternative = "two.sided")
+```
+
+Our observed power was quite high at 0.96, which is much higher than our minimally acceptable power of 0.80 and very close to maximum power of 1. In other words, we collected more data than what was required.
+
+#### Power via Simulation
+
+![](img/advanced.png){width=100px}
+
+```{r}
+mean(replicate(10000, {
+  one_sample <- tibble(expend = c(rnorm(n = n_lean, 
+                                        mean = m_lean, 
+                                        sd = s_lean), 
+                                  rnorm(n = n_obese, 
+                                        mean = m_obese, 
+                                        sd = s_obese)), 
+                       stature = c(rep(x = "lean", 
+                                       times = n_lean), 
+                                   rep(x = "obese", 
+                                       times = n_obese)))
+  t.test(expend ~ stature, data = one_sample)$p.value < 0.05
+}))
+```
+
+### A Priori Power Analysis
+
+Because the observed power of our test was quite high, we might again be interested in knowing the minimum sample size required to attain a significant p-value in this situation. We might be interested in this minimum to inform future studies.
+
+For this we return to `pwr::pwr.t.test()` to remove the unequal sample sizes issue and simply pass a `NULL` value for the `n` argument and now pass 0.80 as the value for the `power` argument.
+
+```{r}
+p <- pwr::pwr.t.test(n = NULL,
+                     d = cohens_d,
+                     sig.level = 0.05,
+                     power = 0.80,
+                     type = "two.sample",
+                     alternative = "two.sided")
+```
+
+So we only required 7 observations per sample at a theoretical minimum to detect a Cohen's d of 1.71 using a two-sample t-test to test a two-tailed hypothesis. Because we have two samples in this case, the minimum total sample size required in this situation was 14 observations evenly distributed across the two groups.
+
+And here is a visualization of power as a function of sample size.
+
+```{r}
+plot(p)
+```
+
+### Practice
+
+This practice problem is inspired by @stephens_swearing_2009. Pain researchers have some standardized ways of testing how long people can tolerate pain. One way of testing pain tolerance is to time how long a person can stand to keep their hand submerged in freezing water. Imagine we wish to test whether there is any effect of cursing (i.e., swearing) on pain tolerance. For the swearing group we observe M = 190.63 (SD = 82.81) seconds on 11 observations. For the control group we observed M = 83.28 (SD = 61.42) seconds on 9 observations.
+
+First compute the pooled standard deviation using our custom function `pooled_sd`
+
+```{r}
+
+```
+
+Next compute Cohen's d
+
+```{r}
+
+```
+
+Now perform a post hoc power analysis to determine the observed power using `pwr::pwr.t2n.test()`
+
+```{r}
+
+```
+
+Finally, compute the minimum sample size required in each of two equally sized groups to show this effect is statistically significant.
+
+```{r}
+
+```
+
+## Paired-samples t-test
+
+Now, we apply the same ideas to a paired t-test example.
+
+### Hypotheses
+
+$H_o: \mu_{post} = \mu_{pre}$
+
+$H_a: \mu_{post} \ne \mu_{pre}$
+
+```{r}
+intake.csv <- read_csv(here("data", "intake.csv"))
+
+(n <- n_pre <- n_post <- nrow(intake.csv))
+(m_post <- mean(intake.csv$post))
+(m_pre <- mean(intake.csv$pre))
+(s_post <- sd(intake.csv$post))
+(s_pre <- sd(intake.csv$pre))
+
+t.test(intake.csv$post, intake.csv$pre, paired = TRUE)
+```
+
+### Interpretation
+
+A paired-samples t-test suggested there was a significant difference on intake scores such that post-scores (M = 5,433.18, SD = 1,216.83) were lower than pre-scores (M = 6,753.64, SD = 1,142.12), t(10) = -11.94, p = .00.
+
+### Post-Hoc Power Analysis
+
+Because our test was significant, we already know our observed power was adequate, but let us calculate what is was anyway.
+
+In this example, we now have to compute a different effect. This time the effect is known as Cohen's dz [@cohen1988statistical] (f. 2.5.10, p. 73), and here is the formula:
+
+$$d_s = \frac{\bar{Z}}{s}$$
+
+Perhaps the easiest way to compute this new effect is to first compute difference scores by subtracting post from pre, then computing the mean and standard deviation of those difference scores, and finally dividing the mean by the standard deviation.
+
+```{r}
+intake.csv$difference <- intake.csv$post - intake.csv$pre
+(m_diffs <- mean(intake.csv$difference))
+(s_diffs <- sd(intake.csv$difference))
+(cohens_dz <- m_diffs / s_diffs)
+```
+
+Note that the order of subtracting the post from the pre scores provides for an easier interpretation of the effect. A positive effect suggests an increase from pre to post while a negative effect suggests a decrease going from pre to post.
+
+Let us quickly check the help document for `pwr::pwr.t.test()` to re-familiarize ourselves with the argument requirements.
+
+```{r, eval=FALSE}
+?pwr::pwr.t.test
+```
+
+This time, `d` will be Cohen's dz as opposed to Cohen's d, and we need to specify `type` as `"paired"`.
+
+```{r}
+pwr::pwr.t.test(n = n,
+                d = cohens_dz,
+                sig.level = 0.05,
+                power = NULL,
+                type = "paired",
+                alternative = "two.sided")
+```
+
+Our observed power was basically maximized at 1. In other words, we collected *WAY* more data than what was required.
+
+#### Power via Simulation
+
+![](img/advanced.png){width=100px}
+
+```{r}
+# paired t is equivalent to one-sample on the differences
+mean(replicate(10000, {
+  t.test(rnorm(n = n, 
+               mean = m_diffs, 
+               sd = s_diffs), 
+         mu = 0)$p.value < 0.05
+}))
+```
+
+### A Priori Power Analysis
+
+Because the observed power of our test was *SO* high, we might be especially interested in again knowing the minimum sample size required to attain a significant p-value in this situation to inform future studies.
+
+For this we again use `pwr::pwr.t.test()` and simply pass a `NULL` value for the `n` argument, `0.80` for the power argument, and remember to pass `"paired"` for `type`.
+
+```{r}
+p <- pwr::pwr.t.test(n = NULL,
+                     d = cohens_dz,
+                     sig.level = 0.05,
+                     power = 0.80,
+                     type = "paired",
+                     alternative = "two.sided")
+
+p
+```
+
+So we only required 3 observations per sample at a theoretical minimum to detect a Cohen's dz of 3.60 using a paired-samples t-test to test a two-tailed hypothesis. Because our "samples" are paired, there is only one sample and so the minimum total sample size required in this situation is just 3, with each observation having both a pre and post score.
+
+And here is a visualization of power as a function of sample size.
+
+```{r}
+plot(p)
+```
+
+### Practice
+
+@fayers_vibration-assisted_2010 conducted a study of pairs of pain ratings from patients who underwent injections of anesthesia (pain-blocking medicine) before surgery on their upper eyelids. They hypothesized that vibration might reduce the perceived pain of the injection. Vibration was applied to the forehead between the eyes before an injection in one eyelid but not the other. After each injection, the patients rated their pain from 0 (no pain) to 10 (worst pain imaginable). Simulated data based on the descriptive statistics reported in the article are provided in the `pain.csv` file in the data folder.
+
+This time, you will do everything starting with reading in the data.
+
+First, read in the data.
+
+```{r}
+
+```
+
+Second, calculate the
+
+* difference scores, subtracting control from vibration
+* sample size
+* mean of the difference scores
+* standard deviation of the difference scores
+* effect size Cohen's dz
+
+```{r}
+
+```
+
+Third, conduct an post-hoc power analysis to calculated the observed power.
+
+```{r}
+
+```
+
+Finally, conduct an a priori power analysis to calculate the minimum required sample size to detect this effect size at 95% significant and 80% power.
+
+```{r}
+
+```
+
+## Going Further
+
+There are power functions in the base R `stats` package such as `power.t.test`, but the `pwr` package both replicates and extends this functionality.
+
+To learn some more about the `pwr` package, you might check out the vignette by typing `??pwr` in the console and clicking on the vignette link in the help viewer.
+
+I also use another power calculating package enough to warrant mention. `powerSurvEpi` offers functions for other tests such as odds ratios and comparing two survival curves.
+
+Finally, because many designs/situations are complicated, computers are fast, and tools like `R` are available that it is just easier to perform power analysis through simulation.
+
+## References
+
