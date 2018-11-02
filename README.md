@@ -1,5 +1,5 @@
 # power-analysis <img src="/img/logo.png" align="right" />
-[![](https://img.shields.io/badge/seminar-seminar%20name-brightgreen.svg)](https://github.com/slu-dss/power-analysis/)
+[![](https://img.shields.io/badge/seminar-power%20analysis-brightgreen.svg)](https://github.com/slu-dss/power-analysis/)
 [![](https://img.shields.io/badge/lesson%20status-under%20development-red.svg)](https://github.com/slu-dss/power-analysis/)
 [![](https://img.shields.io/github/release/slu-dss/power-analysis.svg?label=version)](https://github.com/slu-dss/power-analysis/releases)
 [![](https://img.shields.io/github/last-commit/slu-dss/power-analysis.svg)](https://github.com/slu-dss/power-analysis/commits/master)
