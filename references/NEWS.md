@@ -1,3 +1,4 @@
-# empty-lesson v0.1.0
+# power-analysis v0.1.0
 
 * Add lesson template files
+* Add initial content

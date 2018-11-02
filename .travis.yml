@@ -18,5 +18,4 @@ matrix:
       os: osx
 
 script:
-  - Rscript -e "rmarkdown::render('notebook/empty-lesson-complete.Rmd')"
-  - Rscript -e "rmarkdown::render('challenge/empty-lesson-challenge-complete.Rmd')"
+  - Rscript -e "rmarkdown::render('notebook/power-analysis-complete.Rmd')"

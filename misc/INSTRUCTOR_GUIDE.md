@@ -1,4 +1,4 @@
-# empty-lesson Instructor Guide
+# power-analysis Instructor Guide
 
 # answer key for notebook
 

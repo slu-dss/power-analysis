@@ -52,8 +52,7 @@ build_script:
   - travis-tool.sh install_deps
 
 test_script:
-  - Rscript -e "rmarkdown::render('notebook/empty-lesson-complete.Rmd')"
-  - Rscript -e "rmarkdown::render('challenge/empty-lesson-challenge-complete.Rmd')"
+  - Rscript -e "rmarkdown::render('notebook/power-analysis-complete.Rmd')"
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*

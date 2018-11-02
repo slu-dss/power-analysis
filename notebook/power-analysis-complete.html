@@ -222,7 +222,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Power Analysis Primer</h1>
 <h4 class="author"><em>Matt Schuelke</em></h4>
-<h4 class="date"><em>(October 31, 2018)</em></h4>
+<h4 class="date"><em>(November 02, 2018)</em></h4>
 
 </div>
 
@@ -239,6 +239,12 @@ library(tibble) # make fancy data frames</code></pre>
 <p>Now you try loading an additional package - <code>here</code> (for working with file paths):</p>
 <pre class="r"><code>library(here)</code></pre>
 <pre><code>## here() starts at C:/Users/schuelkem/OneDrive - Saint Louis University/Data Science Seminar/repos/power-analysis</code></pre>
+<div id="package-pwr" class="section level3">
+<h3>Package <code>pwr</code></h3>
+<p>The <a href="https://cran.r-project.org/package=pwr">pwr package</a> is a handy package for doing power analyses for various common statistical procedures. This is not a standard R package, so you will need to install it before you run it. You only have to install it once, so I’m actually preventing this chunk from running automatically by setting the chunk option <code>eval = FALSE</code>. The only way this chunk runs is if I specifically put my cursor in it and tell it to run manually.</p>
+<p>If you do not have this package installed, you will need to do likewise, but only once.</p>
+<pre class="r"><code>install.packages(&quot;pwr&quot;)</code></pre>
+</div>
 </div>
 <div id="power-primer-refresh" class="section level2">
 <h2>Power Primer Refresh</h2>
@@ -271,15 +277,10 @@ library(tibble) # make fancy data frames</code></pre>
 </ul>
 <p>There are several reasons why one might perform a power analysis with the most common being to determine the required number of observations to detect a given effect size. Another quite common reason would be to determine if one can achieve sufficient power given limited resources. Power analyses are often required for project proposals and are one step in performing quality research because they make one think through their project in detail.</p>
 </div>
-<div id="package-pwr" class="section level2">
-<h2>Package <code>pwr</code></h2>
-<p>The <a href="https://cran.r-project.org/package=pwr">pwr package</a> is a handy package for doing power analyses for various common statistical procedures. This is not a standard R package, so you will need to install it before you run it. You only have to install it once, so I’m actually preventing this chunk from running automatically by setting the chunk option <code>eval = FALSE</code>. The only way this chunk runs is if I specifically put my cursor in it and tell it to run manually.</p>
-<p>If you do not have this package installed, you will need to do likewise, but only once.</p>
-<pre class="r"><code>install.packages(&quot;pwr&quot;)</code></pre>
-</div>
 <div id="one-sample-t-test" class="section level2">
 <h2>One-sample t-test</h2>
-<p>First, we read in some data, calculate some descriptive statistics, and then perform a one-sample t-test where we compare our sample to a mean of 1.</p>
+<p>First, we read in some data, calculate some descriptive statistics, and then perform a one-sample t-test.</p>
+<p>Gettelfinger and Cussler <span class="citation">(2004)</span> wondered whether swimmers would go faster or slower if the fluid viscosity was increased. To test the question, they collected swim times for each person in both syrup and water and compared the ratio of syrup- to water-time to a constant of 1.</p>
 <div id="hypotheses" class="section level3">
 <h3>Hypotheses</h3>
 <p><span class="math inline">\(H_o: \mu = 1\)</span></p>
@@ -309,8 +310,8 @@ library(tibble) # make fancy data frames</code></pre>
 ##  1.011667</code></pre>
 </div>
 <div id="interpretation" class="section level3">
-<h3>Interpretation:</h3>
-<p>A one-sample t-test suggested that our sample of swimmer times (M = 1.01, SD = 0.04) was not significantly different than 1 minute, t(17) = 1.17, p = 0.26.</p>
+<h3>Interpretation</h3>
+<p>A one-sample t-test suggested fluid viscosity has no effect on swim speed as the ratio of syrup to water times (M = 1.01, SD = 0.04) was not significantly different than 1, t(17) = 1.17, p = 0.26.</p>
 </div>
 <div id="post-hoc-power-analysis" class="section level3">
 <h3>Post-hoc Power Analysis</h3>
@@ -383,19 +384,27 @@ library(tibble) # make fancy data frames</code></pre>
                sd = s), 
          mu = 1)$p.value &lt; 0.05
 }))</code></pre>
-<pre><code>## [1] 0.2056</code></pre>
+<pre><code>## [1] 0.2006</code></pre>
 </div>
 </div>
 <div id="a-priori-power-analysis" class="section level3">
 <h3>A Priori Power Analysis</h3>
 <p>Because the observed power of our test was quite low, the next logical question is what would be the minimum sample size required to attain a significant p-value in this situation? So that we might do better next time.</p>
 <p>We simply pass a NULL value for the n argument and now pass 0.80 as the value for the power argument.</p>
-<pre class="r"><code>p &lt;- pwr::pwr.t.test(n = NULL,
-                     d = cohens_d,
-                     sig.level = 0.05,
-                     power = 0.80,
-                     type = &quot;one.sample&quot;,
-                     alternative = &quot;two.sided&quot;)</code></pre>
+<pre class="r"><code>(p &lt;- pwr::pwr.t.test(n = NULL,
+                      d = cohens_d,
+                      sig.level = 0.05,
+                      power = 0.80,
+                      type = &quot;one.sample&quot;,
+                      alternative = &quot;two.sided&quot;))</code></pre>
+<pre><code>## 
+##      One-sample t test power calculation 
+## 
+##               n = 105.2253
+##               d = 0.2756624
+##       sig.level = 0.05
+##           power = 0.8
+##     alternative = two.sided</code></pre>
 <p>So we would need 106 (round up because can’t have 0.23 observations) swimmers at a theoretical minimum to detect a Cohen’s d of 0.28 using a one-sample t-test to test a two-tailed hypothesis.</p>
 <p>And here is a visualization of power as a function of sample size.</p>
 <pre class="r"><code>plot(p)</code></pre>
@@ -444,6 +453,7 @@ library(tibble) # make fancy data frames</code></pre>
 <div id="two-sample-t-test" class="section level2">
 <h2>Two-sample t-test</h2>
 <p>Let’s do the same things for a two-sample t-test. First we read in some data, then calculate some descriptive statistics, and finally perform the two-sample t-test.</p>
+<p>This data is taken from Altman <span class="citation">(1999)</span> where energy expenditures were observed for a group of lean and a group of obese women. The question was whether mass has any effect on energy expenditure.</p>
 <div id="hypotheses-1" class="section level3">
 <h3>Hypotheses</h3>
 <p><span class="math inline">\(H_o: \mu_1 = \mu_2\)</span></p>
@@ -548,19 +558,29 @@ library(tibble) # make fancy data frames</code></pre>
                                        times = n_obese)))
   t.test(expend ~ stature, data = one_sample)$p.value &lt; 0.05
 }))</code></pre>
-<pre><code>## [1] 0.9491</code></pre>
+<pre><code>## [1] 0.9488</code></pre>
 </div>
 </div>
 <div id="a-priori-power-analysis-1" class="section level3">
 <h3>A Priori Power Analysis</h3>
 <p>Because the observed power of our test was quite high, we might again be interested in knowing the minimum sample size required to attain a significant p-value in this situation. We might be interested in this minimum to inform future studies.</p>
 <p>For this we return to <code>pwr::pwr.t.test()</code> to remove the unequal sample sizes issue and simply pass a <code>NULL</code> value for the <code>n</code> argument and now pass 0.80 as the value for the <code>power</code> argument.</p>
-<pre class="r"><code>p &lt;- pwr::pwr.t.test(n = NULL,
-                     d = cohens_d,
-                     sig.level = 0.05,
-                     power = 0.80,
-                     type = &quot;two.sample&quot;,
-                     alternative = &quot;two.sided&quot;)</code></pre>
+<pre class="r"><code>(p &lt;- pwr::pwr.t.test(n = NULL,
+                      d = cohens_d,
+                      sig.level = 0.05,
+                      power = 0.80,
+                      type = &quot;two.sample&quot;,
+                      alternative = &quot;two.sided&quot;))</code></pre>
+<pre><code>## 
+##      Two-sample t test power calculation 
+## 
+##               n = 6.479619
+##               d = 1.710912
+##       sig.level = 0.05
+##           power = 0.8
+##     alternative = two.sided
+## 
+## NOTE: n is number in *each* group</code></pre>
 <p>So we only required 7 observations per sample at a theoretical minimum to detect a Cohen’s d of 1.71 using a two-sample t-test to test a two-tailed hypothesis. Because we have two samples in this case, the minimum total sample size required in this situation was 14 observations evenly distributed across the two groups.</p>
 <p>And here is a visualization of power as a function of sample size.</p>
 <pre class="r"><code>plot(p)</code></pre>
@@ -611,6 +631,7 @@ library(tibble) # make fancy data frames</code></pre>
 <div id="paired-samples-t-test" class="section level2">
 <h2>Paired-samples t-test</h2>
 <p>Now, we apply the same ideas to a paired t-test example.</p>
+<p>This data was taken from Altman <span class="citation">(1999)</span>. Here we compare energy intake for each woman both pre- and post-menstration to see if there is any effect of menstration on intake.</p>
 <div id="hypotheses-2" class="section level3">
 <h3>Hypotheses</h3>
 <p><span class="math inline">\(H_o: \mu_{post} = \mu_{pre}\)</span></p>
@@ -702,14 +723,12 @@ mean(replicate(10000, {
 <h3>A Priori Power Analysis</h3>
 <p>Because the observed power of our test was <em>SO</em> high, we might be especially interested in again knowing the minimum sample size required to attain a significant p-value in this situation to inform future studies.</p>
 <p>For this we again use <code>pwr::pwr.t.test()</code> and simply pass a <code>NULL</code> value for the <code>n</code> argument, <code>0.80</code> for the power argument, and remember to pass <code>&quot;paired&quot;</code> for <code>type</code>.</p>
-<pre class="r"><code>p &lt;- pwr::pwr.t.test(n = NULL,
-                     d = cohens_dz,
-                     sig.level = 0.05,
-                     power = 0.80,
-                     type = &quot;paired&quot;,
-                     alternative = &quot;two.sided&quot;)
-
-p</code></pre>
+<pre class="r"><code>(p &lt;- pwr::pwr.t.test(n = NULL,
+                      d = cohens_dz,
+                      sig.level = 0.05,
+                      power = 0.80,
+                      type = &quot;paired&quot;,
+                      alternative = &quot;two.sided&quot;))</code></pre>
 <pre><code>## 
 ##      Paired t test power calculation 
 ## 
@@ -799,17 +818,23 @@ p</code></pre>
 <div id="references" class="section level2 unnumbered">
 <h2>References</h2>
 <div id="refs" class="references">
+<div id="ref-altman_practical_1999">
+<p>Altman, D. G. 1999. <em>Practical Statistics for Medical Research</em>. 1st ed. Boca Raton: CRC Press.</p>
+</div>
 <div id="ref-brick_association_2010">
 <p>Brick, Cameron A., Darbi L. Seely, and Tonya M. Palermo. 2010. “Association Between Sleep Hygiene and Sleep Quality in Medical Students.” <em>Behavioral Sleep Medicine</em> 8 (2): 113–21. doi:<a href="https://doi.org/10.1080/15402001003622925">10.1080/15402001003622925</a>.</p>
 </div>
 <div id="ref-carney_daily_2006">
 <p>Carney, Colleen E., Jack D. Edinger, Björn Meyer, Linda Lindman, and Tai Istre. 2006. “Daily Activities and Sleep Quality in College Students.” <em>Chronobiology International</em> 23 (3): 623–37. doi:<a href="https://doi.org/10.1080/07420520600650695">10.1080/07420520600650695</a>.</p>
 </div>
-<div id="ref-cohen1988statistical">
-<p>Cohen, Jacob. 1988. “Statistical Power Analysis for the Behavioral Sciences. 2nd.” Hillsdale, NJ: erlbaum.</p>
+<div id="ref-cohen_statistical_1988">
+<p>Cohen, J. 1988. <em>Statistical Power Analysis for the Behavioral Sciences</em>. 2nd ed. New York: Psychology Press.</p>
 </div>
 <div id="ref-fayers_vibration-assisted_2010">
 <p>Fayers, Tessa, Daniel S. Morris, and Peter J. Dolman. 2010. “Vibration-Assisted Anesthesia in Eyelid Surgery.” <em>Ophthalmology</em> 117 (7): 1453–7. doi:<a href="https://doi.org/10.1016/j.ophtha.2009.11.025">10.1016/j.ophtha.2009.11.025</a>.</p>
+</div>
+<div id="ref-gettelfinger_will_2004">
+<p>Gettelfinger, Brian, and E. L. Cussler. 2004. “Will Humans Swim Faster or Slower in Syrup?” <em>AIChE Journal</em> 50 (11): 2646–7. doi:<a href="https://doi.org/10.1002/aic.10389">10.1002/aic.10389</a>.</p>
 </div>
 <div id="ref-stephens_swearing_2009">
 <p>Stephens, Richard, John Atkins, and Andrew Kingston. 2009. “Swearing as a Response to Pain:” <em>NeuroReport</em>, June, 1. doi:<a href="https://doi.org/10.1097/WNR.0b013e32832e64b1">10.1097/WNR.0b013e32832e64b1</a>.</p>

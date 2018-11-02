@@ -21,15 +21,25 @@ This notebook introduces the concept of statistical power through explanation, e
 
 The following code loads the package dependencies for our work.
 
-```{r package-load-1}
+```{r}
 library(readr)  # import csv data files
 library(tibble) # make fancy data frames
 ```
 
 Now you try loading an additional package - `here` (for working with file paths):
 
-```{r package-load-2}
+```{r}
 
+```
+
+### Package `pwr`
+
+The [pwr package](https://cran.r-project.org/package=pwr) is a handy package for doing power analyses for various common statistical procedures. This is not a standard R package, so you will need to install it before you run it. You only have to install it once, so I'm actually preventing this chunk from running automatically by setting the chunk option `eval = FALSE`. The only way this chunk runs is if I specifically put my cursor in it and tell it to run manually.
+
+If you do not have this package installed, you will need to do likewise, but only once.
+
+```{r, eval=FALSE}
+install.packages("pwr")
 ```
 
 ## Power Primer Refresh
@@ -57,19 +67,11 @@ A commonly accepted cut-off for $\beta$ is 0.20 which means folks often seek pow
 
 There are several reasons why one might perform a power analysis with the most common being to determine the required number of observations to detect a given effect size. Another quite common reason would be to determine if one can achieve sufficient power given limited resources. Power analyses are often required for project proposals and are one step in performing quality research because they make one think through their project in detail.
 
-## Package `pwr`
-
-The [pwr package](https://cran.r-project.org/package=pwr) is a handy package for doing power analyses for various common statistical procedures. This is not a standard R package, so you will need to install it before you run it. You only have to install it once, so I'm actually preventing this chunk from running automatically by setting the chunk option `eval = FALSE`. The only way this chunk runs is if I specifically put my cursor in it and tell it to run manually.
-
-If you do not have this package installed, you will need to do likewise, but only once.
-
-```{r, eval=FALSE}
-install.packages("pwr")
-```
-
 ## One-sample t-test
 
-First, we read in some data, calculate some descriptive statistics, and then perform a one-sample t-test where we compare our sample to a mean of 1.
+First, we read in some data, calculate some descriptive statistics, and then perform a one-sample t-test.
+
+Gettelfinger and Cussler [-@gettelfinger_will_2004] wondered whether swimmers would go faster or slower if the fluid viscosity was increased. To test the question, they collected swim times for each person in both syrup and water and compared the ratio of syrup- to water-time to a constant of 1.
 
 ### Hypotheses
 
@@ -87,9 +89,9 @@ swimmers.csv <- read_csv(here("data", "swimmers.csv"))
 t.test(swimmers.csv$speed, mu = 1)
 ```
 
-### Interpretation:
+### Interpretation
 
-A one-sample t-test suggested that our sample of swimmer times (M = 1.01, SD = 0.04) was not significantly different than 1 minute, t(17) = 1.17, p = 0.26.
+A one-sample t-test suggested fluid viscosity has no effect on swim speed as the ratio of syrup to water times (M = 1.01, SD = 0.04) was not significantly different than 1, t(17) = 1.17, p = 0.26.
 
 ### Post-hoc Power Analysis
 
@@ -122,7 +124,7 @@ Here we see that we need to pass all of the following arguments (except for the 
 
 Because we wish to calculate the observed power of our test, we will need to figure out values for all the arguments except for `power` will be passed as `NULL` and thus calculated based on the value of these other arguments by the function.
 
-Cohen's d is actually a family of effect sizes describing the difference between groups in standard deviation units (very similar to the formula for a z-score). The formula for the one sample case given by Cohen [-@cohen1988statistical] (f. 2.5.7, p. 72) is:
+Cohen's d is actually a family of effect sizes describing the difference between groups in standard deviation units (very similar to the formula for a z-score). The formula for the one sample case given by Cohen [-@cohen_statistical_1988] (f. 2.5.7, p. 72) is:
 
 $$d_s = \frac{\bar{X} - c}{s}$$
 
@@ -167,12 +169,12 @@ Because the observed power of our test was quite low, the next logical question 
 We simply pass a NULL value for the n argument and now pass 0.80 as the value for the power argument.
 
 ```{r}
-p <- pwr::pwr.t.test(n = NULL,
-                     d = cohens_d,
-                     sig.level = 0.05,
-                     power = 0.80,
-                     type = "one.sample",
-                     alternative = "two.sided")
+(p <- pwr::pwr.t.test(n = NULL,
+                      d = cohens_d,
+                      sig.level = 0.05,
+                      power = 0.80,
+                      type = "one.sample",
+                      alternative = "two.sided"))
 ```
 
 So we would need 106 (round up because can't have 0.23 observations) swimmers at a theoretical minimum to detect a Cohen's d of 0.28 using a one-sample t-test to test a two-tailed hypothesis.
@@ -215,6 +217,8 @@ Finally conduct an a priori power analysis to determine the minimum number of su
 
 Let's do the same things for a two-sample t-test. First we read in some data, then calculate some descriptive statistics, and finally perform the two-sample t-test.
 
+This data is taken from Altman [-@altman_practical_1999] where energy expenditures were observed for a group of lean and a group of obese women. The question was whether mass has any effect on energy expenditure.
+
 ### Hypotheses
 
 $H_o: \mu_1 = \mu_2$
@@ -246,7 +250,7 @@ While the earlier example was an under-powered one-sample t-test, this example f
 
 Even though the significance of the test tells us that our observed power is greater than our minimally acceptable 0.80, we might wish to calculate what it was.
 
-To do so we need to calculate a different version of Cohen's d. The formula for a two-sample test [@cohen1988statistical] (f. 2.5.1, p. 66) is:
+To do so we need to calculate a different version of Cohen's d. The formula for a two-sample test [@cohen_statistical_1988] (f. 2.5.1, p. 66) is:
 
 $$d_s = \frac{\bar{X}_a - \bar{X}_b}{s}$$
 
@@ -268,7 +272,7 @@ We see most of the same required arguments as before, but now the `n` argument i
 
 The second practical consideration that results from the new idea of differing groups sizes is that our effect size for t-tests (i.e., Cohen's d) requires a single estimate of the spread of the data. Therefore, we must calculate a [pooled standard deviation](https://en.wikipedia.org/wiki/Pooled_variance).
 
-While pooled deviations can be calculated for any number of groups, a formula for just two groups [@cohen1988statistical] (f. 2.5.2, p. 67) is:
+While pooled deviations can be calculated for any number of groups, a formula for just two groups [@cohen_statistical_1988] (f. 2.5.2, p. 67) is:
 
 $$s = \sqrt{\frac{\sum{(X_A - \bar{X_A})^2} + \sum{(X_B - \bar{X_B})^2}}{n_a + n_b - 2}}$$
 
@@ -330,12 +334,12 @@ Because the observed power of our test was quite high, we might again be interes
 For this we return to `pwr::pwr.t.test()` to remove the unequal sample sizes issue and simply pass a `NULL` value for the `n` argument and now pass 0.80 as the value for the `power` argument.
 
 ```{r}
-p <- pwr::pwr.t.test(n = NULL,
-                     d = cohens_d,
-                     sig.level = 0.05,
-                     power = 0.80,
-                     type = "two.sample",
-                     alternative = "two.sided")
+(p <- pwr::pwr.t.test(n = NULL,
+                      d = cohens_d,
+                      sig.level = 0.05,
+                      power = 0.80,
+                      type = "two.sample",
+                      alternative = "two.sided"))
 ```
 
 So we only required 7 observations per sample at a theoretical minimum to detect a Cohen's d of 1.71 using a two-sample t-test to test a two-tailed hypothesis. Because we have two samples in this case, the minimum total sample size required in this situation was 14 observations evenly distributed across the two groups.
@@ -378,6 +382,8 @@ Finally, compute the minimum sample size required in each of two equally sized g
 
 Now, we apply the same ideas to a paired t-test example.
 
+This data was taken from Altman [-@altman_practical_1999]. Here we compare energy intake for each woman both pre- and post-menstration to see if there is any effect of menstration on intake.
+
 ### Hypotheses
 
 $H_o: \mu_{post} = \mu_{pre}$
@@ -404,7 +410,7 @@ A paired-samples t-test suggested there was a significant difference on intake s
 
 Because our test was significant, we already know our observed power was adequate, but let us calculate what is was anyway.
 
-In this example, we now have to compute a different effect. This time the effect is known as Cohen's dz [@cohen1988statistical] (f. 2.5.10, p. 73), and here is the formula:
+In this example, we now have to compute a different effect. This time the effect is known as Cohen's dz [@cohen_statistical_1988] (f. 2.5.10, p. 73), and here is the formula:
 
 $$d_s = \frac{\bar{Z}}{s}$$
 
@@ -459,14 +465,12 @@ Because the observed power of our test was *SO* high, we might be especially int
 For this we again use `pwr::pwr.t.test()` and simply pass a `NULL` value for the `n` argument, `0.80` for the power argument, and remember to pass `"paired"` for `type`.
 
 ```{r}
-p <- pwr::pwr.t.test(n = NULL,
-                     d = cohens_dz,
-                     sig.level = 0.05,
-                     power = 0.80,
-                     type = "paired",
-                     alternative = "two.sided")
-
-p
+(p <- pwr::pwr.t.test(n = NULL,
+                      d = cohens_dz,
+                      sig.level = 0.05,
+                      power = 0.80,
+                      type = "paired",
+                      alternative = "two.sided"))
 ```
 
 So we only required 3 observations per sample at a theoretical minimum to detect a Cohen's dz of 3.60 using a paired-samples t-test to test a two-tailed hypothesis. Because our "samples" are paired, there is only one sample and so the minimum total sample size required in this situation is just 3, with each observation having both a pre and post score.

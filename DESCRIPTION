@@ -1,18 +1,19 @@
-Package: empty-lesson
-Title: An empty version of the SLU DSS lesson template
+Package: power-analysis
+Title: Power Analysis Primer
 Version: 0.1.0
-Authors@R: person("Christopher", "Prener", email = "chris.prener@slu.edu",
+Authors@R: person("Matthew", "Schuelke", email = "matthew.schuelke@slu.edu",
                   role = c("aut", "cre"))
-Description: This repository contains an empty version of the lesson template
-    and is designed to help instructors and maintainers get started with the
-    creation of new lessons. It can also be used to convert older lessons.
-Depends: R (>= 3.3)
+Description: This repository contains content for a brownbag on statistical power analysis.
+Depends: R (>= 3.5)
 License: CC-BY-SA-4.0 + LICENSE
 Web: https://slu-dss.github.io
-URL: https://github.com/slu-dss/empty-lesson
-BugReports: https://github.com/slu-dss/empty-lesson/issues
+URL: https://github.com/slu-dss/power-analysis
+BugReports: https://github.com/slu-dss/power-analysis/issues
 Imports:
     here,
     knitr,
+	pwr,
+	readr,
     rmarkdown,
+	tibble,
     usethis

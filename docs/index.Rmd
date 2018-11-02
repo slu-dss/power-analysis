@@ -337,7 +337,7 @@ In terms of signal and noise, what effect would the inclusion and exclusion crit
 
 We almost never know the true state of the world
 
-This does not stop us from making two types of errors
+This allows for two types of errors:
 - Type I: rejecting the null when it is true
 - Type II: failing to reject the null when it is false
 
